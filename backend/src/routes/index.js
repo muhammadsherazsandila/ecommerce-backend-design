@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { authRouter } from "./authRoutes.js";
+import { productRouter } from "./productRoutes.js";
 
 export const router = Router();
 
@@ -8,8 +10,5 @@ router.get("/", (_req, res) => {
   });
 });
 
-router.get("/products", (_req, res) => {
-  res.json({
-    products: [],
-  });
-});
+router.use("/auth", authRouter);
+router.use("/products", productRouter);
