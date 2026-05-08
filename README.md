@@ -4,6 +4,8 @@ A full-stack e-commerce application with a **Node.js/Express** REST API backend 
 
 > **Author:** [Muhammad Sheraz](https://muhammadsheraz.dev/)
 
+> 🌐 **Live Demo:** [ecommerce-backend-by-sheraz.vercel.app](https://ecommerce-backend-by-sheraz.vercel.app)
+
 ---
 
 ## ✨ Features
@@ -256,12 +258,6 @@ Authorization: Bearer <jwt_token>
 | Uploads    | Multer (memory) → Cloudinary                     |
 | Frontend   | React 18 + Vite + Tailwind CSS                   |
 | HTTP Client| Axios                                            |
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
