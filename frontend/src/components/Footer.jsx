@@ -88,7 +88,7 @@ const Footer = () => {
       {/* Bottom Bar */}
       <div className="bg-[#EFF2F4] border-t border-[#DEE2E7] py-6">
         <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[#606060] text-sm">© 2023 Ecommerce.</p>
+          <p className="text-[#606060] text-sm">© 2025 Ecommerce. Built by <a href="https://muhammadsheraz.dev/" target="_blank" rel="noopener noreferrer" className="text-[#0D6EFD] hover:underline">Muhammad Sheraz</a></p>
           <div className="flex items-center gap-4 text-dark text-sm">
              <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors">
                <img src={flagUS} alt="US" className="w-[20px] h-[14px]" />

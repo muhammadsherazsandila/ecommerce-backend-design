@@ -1,120 +1,168 @@
-import React, { useState } from 'react';
-import { ChevronRight, Grid, List, ChevronDown, Star, Heart, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronRight, Grid, List, ChevronDown, Star, Heart, X, Search, Loader2 } from 'lucide-react';
+import { productsAPI } from '../api';
 
-// Import images for products
-import canonImg from '../assets/Image/tech/image 29.png';
-import actionImg from '../assets/Image/tech/6.png';
-import laptopImg from '../assets/Image/tech/image 23.png';
-import watchImg from '../assets/Image/tech/8.png';
-import headphonesImg from '../assets/Image/tech/image 32.png';
-import phone1 from '../assets/Image/tech/image 33.png';
-import phone2 from '../assets/Image/tech/image 34.png';
+const ProductListing = ({ setPage, setSelectedProductId, searchQuery = '', searchCategory = '' }) => {
+  const [viewMode, setViewMode] = useState('grid');
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(searchCategory);
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+  const [sort, setSort] = useState('-createdAt');
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    pages: 0,
+  });
 
-const ProductListing = ({ setPage }) => {
-  const [viewMode, setViewMode] = useState('grid'); // Default to grid as per new request
+  // Fetch products
+  const fetchProducts = async (page = 1) => {
+    setLoading(true);
+    try {
+      const params = {
+        page,
+        limit: pagination.limit,
+        sort,
+      };
+      if (localSearch) params.search = localSearch;
+      if (selectedCategory) params.category = selectedCategory;
 
-  const activeFilters = [
-    "Samsung", "Apple", "Poco", "Metallic", "4 star", "3 star"
-  ];
-
-  const products = [
-    {
-      id: 1,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      oldPrice: "1128.00",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-      image: phone1
-    },
-    {
-      id: 2,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      oldPrice: "1128.00",
-      rating: 5.9,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: phone2
-    },
-    {
-      id: 3,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: phone1
-    },
-    {
-      id: 4,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      oldPrice: "1128.00",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: laptopImg
-    },
-    {
-      id: 5,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      oldPrice: "1128.00",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: canonImg
-    },
-    {
-      id: 6,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: phone2
-    },
-    {
-      id: 7,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      oldPrice: "1128.00",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: laptopImg
-    },
-    {
-      id: 8,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      oldPrice: "1128.00",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: watchImg
-    },
-    {
-      id: 9,
-      title: "GoPro HERO6 4K Action Camera - Black",
-      price: "99.50",
-      rating: 7.5,
-      orders: 154,
-      shipping: "Free Shipping",
-      desc: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit",
-      image: canonImg
+      const { data } = await productsAPI.getAll(params);
+      if (data.success) {
+        setProducts(data.products);
+        setPagination(data.pagination);
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Fetch categories
+  useEffect(() => {
+    productsAPI.getCategories().then(({ data }) => {
+      if (data.success) setCategories(data.categories);
+    }).catch(() => {});
+  }, []);
+
+  // Fetch products when filters change
+  useEffect(() => {
+    fetchProducts(1);
+  }, [selectedCategory, sort, searchQuery, searchCategory]);
+
+  // Sync from parent props
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setSelectedCategory(searchCategory);
+  }, [searchCategory]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchProducts(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.pages) {
+      fetchProducts(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleProductClick = (productId) => {
+    setSelectedProductId(productId);
+    setPage('details');
+  };
+
+  const renderPagination = () => {
+    const { page, pages, total } = pagination;
+    if (pages <= 1) return null;
+
+    const pageNumbers = [];
+    const maxVisible = 5;
+    let startPage = Math.max(1, page - Math.floor(maxVisible / 2));
+    let endPage = Math.min(pages, startPage + maxVisible - 1);
+
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4">
+        <p className="text-sm text-[#8B96A5]">
+          Showing {((page - 1) * pagination.limit) + 1}-{Math.min(page * pagination.limit, total)} of {total} products
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 1}
+            className={`px-3 py-2 border border-[#DEE2E7] rounded-lg text-sm transition-all ${
+              page === 1
+                ? 'opacity-30 cursor-not-allowed'
+                : 'hover:bg-[#E3F0FF] hover:border-[#0D6EFD] hover:text-[#0D6EFD] cursor-pointer'
+            }`}
+          >
+            ‹ Prev
+          </button>
+          {startPage > 1 && (
+            <>
+              <button
+                onClick={() => handlePageChange(1)}
+                className="px-3 py-2 border border-[#DEE2E7] rounded-lg text-sm hover:bg-[#E3F0FF] hover:border-[#0D6EFD] hover:text-[#0D6EFD] transition-all cursor-pointer"
+              >
+                1
+              </button>
+              {startPage > 2 && <span className="text-[#8B96A5] px-1">...</span>}
+            </>
+          )}
+          {pageNumbers.map((num) => (
+            <button
+              key={num}
+              onClick={() => handlePageChange(num)}
+              className={`px-3.5 py-2 border rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                num === page
+                  ? 'bg-[#0D6EFD] text-white border-[#0D6EFD] shadow-md shadow-[#0D6EFD]/20'
+                  : 'border-[#DEE2E7] hover:bg-[#E3F0FF] hover:border-[#0D6EFD] hover:text-[#0D6EFD]'
+              }`}
+            >
+              {num}
+            </button>
+          ))}
+          {endPage < pages && (
+            <>
+              {endPage < pages - 1 && <span className="text-[#8B96A5] px-1">...</span>}
+              <button
+                onClick={() => handlePageChange(pages)}
+                className="px-3 py-2 border border-[#DEE2E7] rounded-lg text-sm hover:bg-[#E3F0FF] hover:border-[#0D6EFD] hover:text-[#0D6EFD] transition-all cursor-pointer"
+              >
+                {pages}
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page === pages}
+            className={`px-3 py-2 border border-[#DEE2E7] rounded-lg text-sm transition-all ${
+              page === pages
+                ? 'opacity-30 cursor-not-allowed'
+                : 'hover:bg-[#E3F0FF] hover:border-[#0D6EFD] hover:text-[#0D6EFD] cursor-pointer'
+            }`}
+          >
+            Next ›
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="container py-4">
@@ -122,119 +170,72 @@ const ProductListing = ({ setPage }) => {
       <div className="flex items-center gap-2 text-[#8B96A5] text-sm mb-6">
         <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setPage('home')}>Home</span>
         <ChevronRight className="w-4 h-4" />
-        <span className="cursor-pointer hover:text-primary transition-colors">Clothings</span>
-        <ChevronRight className="w-4 h-4" />
-        <span className="cursor-pointer hover:text-primary transition-colors">Men's wear</span>
-        <ChevronRight className="w-4 h-4" />
-        <span className="text-[#1C1C1C] font-normal">Summer clothing</span>
+        <span className="text-[#1C1C1C] font-normal">Products</span>
       </div>
 
       <div className="flex gap-6">
         {/* Sidebar Filters */}
-        <aside className="w-[240px] flex-shrink-0 space-y-2">
+        <aside className="w-[240px] flex-shrink-0 space-y-2 hidden lg:block">
+          {/* Search within results */}
+          <div className="py-3">
+            <form onSubmit={handleSearch} className="flex border border-[#DEE2E7] rounded-lg overflow-hidden">
+              <input
+                type="text"
+                value={localSearch}
+                onChange={(e) => setLocalSearch(e.target.value)}
+                placeholder="Search products..."
+                className="flex-1 px-3 py-2 text-sm outline-none"
+              />
+              <button type="submit" className="px-3 bg-[#F7F7F7] hover:bg-[#E3F0FF] transition-colors">
+                <Search size={16} className="text-[#8B96A5]" />
+              </button>
+            </form>
+          </div>
+
           {/* Category */}
           <div className="border-t border-[#DEE2E7] py-3">
             <h4 className="font-bold text-[#1C1C1C] mb-3 flex justify-between items-center cursor-pointer">
               Category <ChevronDown className="w-4 h-4 opacity-50" />
             </h4>
-            <ul className="space-y-3 text-[#505050] text-sm">
-              <li className="hover:text-primary cursor-pointer">Mobile accessory</li>
-              <li className="hover:text-primary cursor-pointer">Electronics</li>
-              <li className="hover:text-primary cursor-pointer">Smartphones</li>
-              <li className="hover:text-primary cursor-pointer">Modern tech</li>
-              <li className="text-primary cursor-pointer mt-1">See all</li>
+            <ul className="space-y-2 text-[#505050] text-sm">
+              <li
+                className={`cursor-pointer transition-colors ${!selectedCategory ? 'text-primary font-medium' : 'hover:text-primary'}`}
+                onClick={() => setSelectedCategory('')}
+              >
+                All Categories
+              </li>
+              {categories.map((cat) => (
+                <li
+                  key={cat}
+                  className={`cursor-pointer transition-colors ${selectedCategory === cat ? 'text-primary font-medium' : 'hover:text-primary'}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Brands */}
+          {/* Sort */}
           <div className="border-t border-[#DEE2E7] py-3">
-            <h4 className="font-bold text-[#1C1C1C] mb-3 flex justify-between items-center cursor-pointer">
-              Brands <ChevronDown className="w-4 h-4 opacity-50" />
-            </h4>
+            <h4 className="font-bold text-[#1C1C1C] mb-3">Sort By</h4>
             <div className="space-y-2">
-              {["Samsung", "Apple", "Huawei", "Pocco", "Lenovo"].map(brand => (
-                <label key={brand} className="flex items-center gap-3 text-[#1C1C1C] text-sm cursor-pointer group">
-                  <input type="checkbox" defaultChecked={["Samsung", "Apple", "Pocco"].includes(brand)} className="w-4 h-4 rounded border-[#DEE2E7] text-primary focus:ring-primary" />
-                  <span className="group-hover:text-primary transition-colors">{brand}</span>
-                </label>
-              ))}
-              <div className="text-primary text-sm cursor-pointer pt-1">See all</div>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="border-t border-[#DEE2E7] py-3">
-            <h4 className="font-bold text-[#1C1C1C] mb-3 flex justify-between items-center cursor-pointer">
-              Features <ChevronDown className="w-4 h-4 opacity-50" />
-            </h4>
-            <div className="space-y-2">
-              {["Metallic", "Plastic cover", "8GB RAM", "Super power", "Large Memory"].map(feature => (
-                <label key={feature} className="flex items-center gap-3 text-[#1C1C1C] text-sm cursor-pointer group">
-                  <input type="checkbox" defaultChecked={feature === "Metallic"} className="w-4 h-4 rounded border-[#DEE2E7] text-primary focus:ring-primary" />
-                  <span className="group-hover:text-primary transition-colors">{feature}</span>
-                </label>
-              ))}
-              <div className="text-primary text-sm cursor-pointer pt-1">See all</div>
-            </div>
-          </div>
-
-          {/* Price Range */}
-          <div className="border-t border-[#DEE2E7] py-3">
-            <h4 className="font-bold text-[#1C1C1C] mb-3 flex justify-between items-center cursor-pointer">
-              Price range <ChevronDown className="w-4 h-4 opacity-50" />
-            </h4>
-            <div className="space-y-4">
-              <div className="relative h-6 flex items-center">
-                <div className="w-full h-1 bg-[#DEE2E7] rounded"></div>
-                <div className="absolute left-[20%] right-[30%] h-1 bg-primary rounded"></div>
-                <div className="absolute left-[20%] w-4 h-4 bg-white border-2 border-primary rounded-full -ml-2"></div>
-                <div className="absolute right-[30%] w-4 h-4 bg-white border-2 border-primary rounded-full -mr-2"></div>
-              </div>
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <p className="text-[#1C1C1C] text-xs mb-1">Min</p>
-                  <input type="text" placeholder="0" className="w-full border border-[#DEE2E7] rounded-md px-3 py-2 text-sm outline-none focus:border-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[#1C1C1C] text-xs mb-1">Max</p>
-                  <input type="text" placeholder="999999" className="w-full border border-[#DEE2E7] rounded-md px-3 py-2 text-sm outline-none focus:border-primary" />
-                </div>
-              </div>
-              <button className="w-full bg-white border border-[#DEE2E7] text-primary py-2 rounded-md text-sm font-medium hover:bg-shade transition-colors shadow-sm">
-                Apply
-              </button>
-            </div>
-          </div>
-
-          {/* Condition */}
-          <div className="border-t border-[#DEE2E7] py-3">
-            <h4 className="font-bold text-[#1C1C1C] mb-3 flex justify-between items-center cursor-pointer">
-              Condition <ChevronDown className="w-4 h-4 opacity-50" />
-            </h4>
-            <div className="space-y-2">
-              {["Any", "Refurbished", "Brand new", "Old items"].map((cond, i) => (
-                <label key={cond} className="flex items-center gap-3 text-[#1C1C1C] text-sm cursor-pointer group">
-                  <input type="radio" name="condition" defaultChecked={i === 0} className="w-4 h-4 border-[#DEE2E7] text-primary focus:ring-primary" />
-                  <span className="group-hover:text-primary transition-colors">{cond}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Ratings */}
-          <div className="border-t border-[#DEE2E7] py-3 pb-4">
-            <h4 className="font-bold text-[#1C1C1C] mb-3 flex justify-between items-center cursor-pointer">
-              Ratings <ChevronDown className="w-4 h-4 opacity-50" />
-            </h4>
-            <div className="space-y-2">
-              {[5, 4, 3, 2].map((stars) => (
-                <label key={stars} className="flex items-center gap-3 cursor-pointer group">
-                  <input type="checkbox" defaultChecked={stars >= 3 && stars <= 4} className="w-4 h-4 rounded border-[#DEE2E7] text-primary focus:ring-primary" />
-                  <div className="flex gap-0.5">
-                    {Array(5).fill(0).map((_, i) => (
-                      <Star key={i} size={14} className={i < stars ? "fill-[#FF9017] text-[#FF9017]" : "text-[#D1D3D3]"} />
-                    ))}
-                  </div>
+              {[
+                { value: '-createdAt', label: 'Newest First' },
+                { value: 'price', label: 'Price: Low to High' },
+                { value: '-price', label: 'Price: High to Low' },
+                { value: '-rating', label: 'Highest Rated' },
+                { value: '-orders', label: 'Most Popular' },
+              ].map((opt) => (
+                <label key={opt.value} className="flex items-center gap-3 text-[#1C1C1C] text-sm cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="sort"
+                    checked={sort === opt.value}
+                    onChange={() => setSort(opt.value)}
+                    className="w-4 h-4 border-[#DEE2E7] text-primary focus:ring-primary"
+                  />
+                  <span className="group-hover:text-primary transition-colors">{opt.label}</span>
                 </label>
               ))}
             </div>
@@ -245,16 +246,25 @@ const ProductListing = ({ setPage }) => {
         <main className="flex-1">
           {/* Top Bar */}
           <div className="bg-white border border-[#DEE2E7] rounded-lg p-4 flex items-center justify-between mb-4">
-            <span className="text-[#1C1C1C] text-sm">12,911 items in <span className="font-bold">Mobile accessory</span></span>
+            <span className="text-[#1C1C1C] text-sm">
+              {pagination.total} items
+              {selectedCategory && <> in <span className="font-bold">{selectedCategory}</span></>}
+              {localSearch && <> for "<span className="font-bold">{localSearch}</span>"</>}
+            </span>
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-normal">
-                <input type="checkbox" className="w-4 h-4 rounded border-[#DEE2E7] text-primary focus:ring-primary" />
-                <span>Verified only</span>
-              </label>
-              <div className="flex items-center gap-2 border border-[#DEE2E7] rounded-md px-3 py-1 bg-white cursor-pointer hover:bg-shade transition-colors">
-                <span className="text-sm">Featured</span>
-                <ChevronDown className="w-4 h-4 opacity-50" />
-              </div>
+              {/* Mobile search */}
+              <form onSubmit={handleSearch} className="flex lg:hidden border border-[#DEE2E7] rounded-md overflow-hidden">
+                <input
+                  type="text"
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  placeholder="Search..."
+                  className="w-32 px-2 py-1 text-sm outline-none"
+                />
+                <button type="submit" className="px-2 bg-[#F7F7F7]">
+                  <Search size={14} />
+                </button>
+              </form>
               <div className="flex border border-[#DEE2E7] rounded-md overflow-hidden">
                 <div
                   className={`p-2 border-r border-[#DEE2E7] cursor-pointer transition-colors ${viewMode === 'grid' ? 'bg-[#EFF2F4]' : 'hover:bg-shade'}`}
@@ -272,27 +282,65 @@ const ProductListing = ({ setPage }) => {
             </div>
           </div>
 
-          {/* Active Filters / Tags */}
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            {activeFilters.map((filter, i) => (
-              <div key={i} className="flex items-center gap-2 px-3 py-1.5 border border-primary rounded-md bg-white text-dark text-sm">
-                <span>{filter}</span>
-                <X size={14} className="text-[#8B96A5] cursor-pointer hover:text-dark" />
-              </div>
-            ))}
-            <button className="text-primary text-sm font-normal hover:underline ml-2">
-              Clear all filter
-            </button>
-          </div>
+          {/* Active Filters */}
+          {(selectedCategory || localSearch) && (
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {selectedCategory && (
+                <div className="flex items-center gap-2 px-3 py-1.5 border border-primary rounded-md bg-white text-dark text-sm">
+                  <span>{selectedCategory}</span>
+                  <X size={14} className="text-[#8B96A5] cursor-pointer hover:text-dark" onClick={() => setSelectedCategory('')} />
+                </div>
+              )}
+              {localSearch && (
+                <div className="flex items-center gap-2 px-3 py-1.5 border border-primary rounded-md bg-white text-dark text-sm">
+                  <span>"{localSearch}"</span>
+                  <X size={14} className="text-[#8B96A5] cursor-pointer hover:text-dark" onClick={() => { setLocalSearch(''); setTimeout(() => fetchProducts(1), 0); }} />
+                </div>
+              )}
+              <button
+                className="text-primary text-sm font-normal hover:underline ml-2"
+                onClick={() => { setSelectedCategory(''); setLocalSearch(''); setTimeout(() => fetchProducts(1), 0); }}
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
 
-          {viewMode === 'list' ? (
+          {/* Loading State */}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-4">
+                <Loader2 className="w-10 h-10 text-[#0D6EFD] animate-spin" />
+                <p className="text-[#8B96A5] text-sm">Loading products...</p>
+              </div>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-24 h-24 bg-[#F7F7F7] rounded-full flex items-center justify-center mb-4">
+                <Search size={40} className="text-[#DEE2E7]" />
+              </div>
+              <h3 className="text-lg font-bold text-[#1C1C1C] mb-2">No products found</h3>
+              <p className="text-[#8B96A5] text-sm mb-4">Try adjusting your search or filters</p>
+              <button
+                onClick={() => { setSelectedCategory(''); setLocalSearch(''); }}
+                className="text-primary font-medium text-sm hover:underline"
+              >
+                Clear all filters
+              </button>
+            </div>
+          ) : viewMode === 'list' ? (
             /* Product List View */
             <div className="space-y-3">
               {products.map((product) => (
-                <div key={product.id} className="bg-white border border-[#DEE2E7] rounded-lg p-5 flex gap-6 hover:shadow-md transition-shadow group cursor-pointer relative" onClick={() => setPage('details')}>
+                <div key={product._id} className="bg-white border border-[#DEE2E7] rounded-lg p-5 flex gap-6 hover:shadow-md transition-shadow group cursor-pointer relative" onClick={() => handleProductClick(product._id)}>
                   {/* Product Image area */}
-                  <div className="w-[210px] h-[210px] lg:w-[240px] lg:h-[240px] flex-shrink-0 flex items-center justify-center bg-[#F7F7F7] rounded-lg p-6 relative overflow-hidden group">
-                    <img src={product.image} alt={product.title} className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300" />
+                  <div className="w-[180px] h-[180px] lg:w-[210px] lg:h-[210px] flex-shrink-0 flex items-center justify-center bg-[#F7F7F7] rounded-lg p-4 relative overflow-hidden">
+                    <img
+                      src={product.image || 'https://via.placeholder.com/200x200?text=No+Image'}
+                      alt={product.name}
+                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => { e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'; }}
+                    />
                   </div>
 
                   {/* Wishlist Button */}
@@ -302,28 +350,28 @@ const ProductListing = ({ setPage }) => {
 
                   {/* Product Info */}
                   <div className="flex-1 py-1">
-                    <h3 className="text-[#1C1C1C] text-base font-semibold group-hover:text-primary transition-colors mb-3">{product.title}</h3>
-                    <div className="flex items-center gap-4 mb-3">
+                    <h3 className="text-[#1C1C1C] text-base font-semibold group-hover:text-primary transition-colors mb-2">{product.name}</h3>
+                    <div className="flex items-center gap-4 mb-2">
                       <div className="flex flex-col">
-                        <span className="text-xl font-bold text-[#1C1C1C]">${product.price}</span>
-                        {product.oldPrice && <span className="text-[#8B96A5] line-through text-sm mt-0.5">${product.oldPrice}</span>}
+                        <span className="text-xl font-bold text-[#1C1C1C]">${product.price.toFixed(2)}</span>
+                        {product.oldPrice && <span className="text-[#8B96A5] line-through text-sm mt-0.5">${product.oldPrice.toFixed(2)}</span>}
                       </div>
                     </div>
 
                     {/* Rating Info */}
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-2 mb-3">
                       <div className="flex gap-0.5">
                         {Array(5).fill(0).map((_, i) => (
-                          <Star key={i} size={14} className={i < Math.floor(product.rating / 2) ? "fill-[#FF9017] text-[#FF9017]" : "text-[#D1D3D3]"} />
+                          <Star key={i} size={14} className={i < Math.round(product.rating) ? "fill-[#FF9017] text-[#FF9017]" : "text-[#D1D3D3]"} />
                         ))}
                       </div>
-                      <span className="text-[#FF9017] text-sm font-medium">{product.rating}</span>
+                      <span className="text-[#FF9017] text-sm font-medium">{product.rating.toFixed(1)}</span>
                       <span className="text-[#8B96A5] text-sm ml-2">• {product.orders} orders</span>
                       <span className="text-[#00B517] text-sm font-medium ml-2">• {product.shipping}</span>
                     </div>
 
-                    <p className="text-[#505050] text-sm leading-relaxed mb-4 line-clamp-2 max-w-2xl">
-                      {product.desc}
+                    <p className="text-[#505050] text-sm leading-relaxed mb-3 line-clamp-2 max-w-2xl">
+                      {product.description}
                     </p>
 
                     <button className="text-primary font-bold text-sm bg-transparent border-none p-0 hover:underline">
@@ -335,16 +383,26 @@ const ProductListing = ({ setPage }) => {
             </div>
           ) : (
             /* Product Grid View */
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {products.map((product) => (
                 <div
-                  key={product.id}
+                  key={product._id}
                   className="bg-white border border-[#DEE2E7] rounded-lg p-4 hover:shadow-[0px_8px_25px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300 group flex flex-col items-center cursor-pointer"
-                  onClick={() => setPage('details')}
+                  onClick={() => handleProductClick(product._id)}
                 >
                   {/* Product Image Area */}
-                  <div className="w-full aspect-square flex items-center justify-center mb-4 bg-[#F7F7F7] rounded-md p-6 overflow-hidden">
-                    <img src={product.image} alt={product.title} className="max-w-[85%] max-h-[85%] object-contain group-hover:scale-110 transition-transform duration-300" />
+                  <div className="w-full aspect-square flex items-center justify-center mb-4 bg-[#F7F7F7] rounded-md p-6 overflow-hidden relative">
+                    <img
+                      src={product.image || 'https://via.placeholder.com/200x200?text=No+Image'}
+                      alt={product.name}
+                      className="max-w-[85%] max-h-[85%] object-contain group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => { e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'; }}
+                    />
+                    {product.featured && (
+                      <span className="absolute top-2 left-2 bg-[#FF9017] text-white text-[10px] font-bold px-2 py-1 rounded-md">
+                        FEATURED
+                      </span>
+                    )}
                   </div>
 
                   {/* Product Info Area */}
@@ -352,12 +410,12 @@ const ProductListing = ({ setPage }) => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex flex-col">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-[#1C1C1C]">${product.price}</span>
+                          <span className="text-lg font-bold text-[#1C1C1C]">${product.price.toFixed(2)}</span>
                           <button className="w-8 h-8 border border-[#DEE2E7] rounded-md flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all shadow-sm" onClick={(e) => e.stopPropagation()}>
                             <Heart size={16} />
                           </button>
                         </div>
-                        {product.oldPrice && <span className="text-[#8B96A5] line-through text-xs">${product.oldPrice}</span>}
+                        {product.oldPrice && <span className="text-[#8B96A5] line-through text-xs">${product.oldPrice.toFixed(2)}</span>}
                       </div>
                     </div>
 
@@ -365,16 +423,21 @@ const ProductListing = ({ setPage }) => {
                     <div className="flex items-center gap-1 mb-3">
                       <div className="flex gap-0.5">
                         {Array(5).fill(0).map((_, i) => (
-                          <Star key={i} size={12} className={i < 4 ? "fill-[#FF9017] text-[#FF9017]" : "text-[#D1D3D3]"} />
+                          <Star key={i} size={12} className={i < Math.round(product.rating) ? "fill-[#FF9017] text-[#FF9017]" : "text-[#D1D3D3]"} />
                         ))}
                       </div>
-                      <span className="text-[#FF9017] text-xs font-medium">{product.rating}</span>
+                      <span className="text-[#FF9017] text-xs font-medium">{product.rating.toFixed(1)}</span>
                     </div>
 
                     {/* Title */}
                     <h3 className="text-[#505050] text-[13px] leading-[1.4] line-clamp-2 hover:text-primary transition-colors">
-                      {product.title}
+                      {product.name}
                     </h3>
+
+                    {/* Stock info */}
+                    <p className={`text-xs mt-2 font-medium ${product.stock > 0 ? 'text-[#00B517]' : 'text-[#FA3434]'}`}>
+                      {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -382,23 +445,7 @@ const ProductListing = ({ setPage }) => {
           )}
 
           {/* Pagination */}
-          <div className="flex justify-end mt-8">
-            <div className="flex items-center gap-3">
-              <div className="flex border border-[#DEE2E7] rounded-md overflow-hidden bg-white">
-                <div className="px-3 py-2 border-r border-[#DEE2E7] cursor-pointer hover:bg-shade transition-colors flex items-center">
-                  <span className="text-secondary text-sm">Show 10</span>
-                  <ChevronDown size={14} className="ml-2" />
-                </div>
-              </div>
-              <div className="flex border border-[#DEE2E7] rounded-md overflow-hidden bg-white">
-                <div className="px-3 py-2 border-r border-[#DEE2E7] opacity-30 cursor-not-allowed text-dark flex items-center">{"<"}</div>
-                <div className="px-4 py-2 border-r border-[#DEE2E7] bg-white hover:bg-shade font-bold text-dark text-sm cursor-pointer">1</div>
-                <div className="px-4 py-2 border-r border-[#DEE2E7] hover:bg-shade cursor-pointer text-dark text-sm transition-colors">2</div>
-                <div className="px-4 py-2 border-r border-[#DEE2E7] hover:bg-shade cursor-pointer text-dark text-sm transition-colors">3</div>
-                <div className="px-3 py-2 hover:bg-shade cursor-pointer text-dark flex items-center transition-colors shadow-sm">{">"}</div>
-              </div>
-            </div>
-          </div>
+          {!loading && products.length > 0 && renderPagination()}
         </main>
       </div>
     </div>

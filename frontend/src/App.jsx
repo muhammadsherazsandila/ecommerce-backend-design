@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Deals from './components/Deals';
@@ -15,94 +16,109 @@ import Cart from './components/Cart';
 import Profile from './components/Profile';
 import Messages from './components/Messages';
 import Orders from './components/Orders';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import AddProduct from './components/AddProduct';
+import { productsAPI } from './api';
 
-// Category Banner Images
-import homeBanner from './assets/Image/backgrounds/image 98.png';
-import electronicsBanner from './assets/Image/backgrounds/image 106.png';
+// Color palette for category section banners
+const BANNER_COLORS = ['#FFE6BF', '#E5F1FF', '#DCFCE7', '#FDE8E8', '#F3E8FF', '#FEF3C7'];
 
-// Home and Outdoor Images
-import itemH1 from './assets/Image/interior/1.png';
-import itemH2 from './assets/Image/interior/3.png';
-import itemH3 from './assets/Image/interior/6.png';
-import itemH4 from './assets/Image/interior/7.png';
-import itemH5 from './assets/Image/interior/8.png';
-import itemH6 from './assets/Image/interior/9.png';
-import itemH7 from './assets/Image/interior/image 89.png';
-import itemH8 from './assets/Image/interior/image 93.png';
-
-// Electronics Images
-import itemE1 from './assets/Image/tech/8.png';
-import itemE2 from './assets/Image/tech/image 85.png';
-import itemE3 from './assets/Image/tech/image 32.png';
-import itemE4 from './assets/Image/tech/image 33.png';
-import itemE5 from './assets/Image/tech/image 34.png';
-import itemE6 from './assets/Image/tech/image 23.png';
-import itemE7 from './assets/Image/tech/image 86.png';
-import itemE8 from './assets/Image/tech/6.png';
-
-function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchCategory, setSearchCategory] = useState('');
+  const [homepageData, setHomepageData] = useState(null);
+  const [homepageLoading, setHomepageLoading] = useState(true);
+  const { isAdmin } = useAuth();
 
-  const homeAndOutdoorItems = [
-    { name: "Soft chairs", price: "19", image: itemH1 },
-    { name: "Sofa & chair", price: "19", image: itemH2 },
-    { name: "Kitchen dishes", price: "19", image: itemH3 },
-    { name: "Smart watches", price: "19", image: itemH4 },
-    { name: "Kitchen mixer", price: "100", image: itemH5 },
-    { name: "Blenders", price: "39", image: itemH6 },
-    { name: "Home appliance", price: "19", image: itemH7 },
-    { name: "Coffee maker", price: "10", image: itemH8 },
-  ];
+  // Single API call for all homepage data
+  useEffect(() => {
+    productsAPI.getHomepage().then(({ data }) => {
+      if (data.success) setHomepageData(data);
+    }).catch(() => { }).finally(() => setHomepageLoading(false));
+  }, []);
 
-  const electronicsItems = [
-    { name: "Smart watches", price: "19", image: itemE1 },
-    { name: "Cameras", price: "89", image: itemE2 },
-    { name: "Headphones", price: "10", image: itemE3 },
-    { name: "Smartphones", price: "19", image: itemE4 },
-    { name: "Gaming set", price: "35", image: itemE5 },
-    { name: "Laptop & PC", price: "340", image: itemE6 },
-    { name: "Smartphones", price: "19", image: itemE7 },
-    { name: "Electric kettle", price: "240", image: itemE8 },
-  ];
+  const handleSearch = useCallback((query, category = '') => {
+    setSearchQuery(query);
+    setSearchCategory(category);
+    setCurrentPage('listing');
+  }, []);
+
+  const handleSetPage = useCallback((page) => {
+    // Protect admin-only pages
+    if (page === 'addProduct' && !isAdmin) {
+      setCurrentPage('login');
+      return;
+    }
+    setCurrentPage(page);
+  }, [isAdmin]);
 
   const renderContent = () => {
     switch (currentPage) {
       case 'listing':
-        return <ProductListing setPage={setCurrentPage} />;
+        return (
+          <ProductListing
+            setPage={handleSetPage}
+            setSelectedProductId={setSelectedProductId}
+            searchQuery={searchQuery}
+            searchCategory={searchCategory}
+          />
+        );
       case 'details':
-        return <ProductDetails setPage={setCurrentPage} />;
+        return (
+          <ProductDetails
+            setPage={handleSetPage}
+            productId={selectedProductId}
+            setSelectedProductId={setSelectedProductId}
+          />
+        );
       case 'cart':
-        return <Cart setPage={setCurrentPage} />;
+        return <Cart setPage={handleSetPage} />;
       case 'profile':
-        return <Profile setPage={setCurrentPage} />;
+        return <Profile setPage={handleSetPage} />;
       case 'message':
-        return <Messages setPage={setCurrentPage} />;
+        return <Messages setPage={handleSetPage} />;
       case 'orders':
-        return <Orders setPage={setCurrentPage} />;
+        return <Orders setPage={handleSetPage} />;
+      case 'login':
+        return <Login setPage={handleSetPage} />;
+      case 'signup':
+        return <Signup setPage={handleSetPage} />;
+      case 'addProduct':
+        return <AddProduct setPage={handleSetPage} />;
       default:
         return (
           <div className="container">
-            <Hero />
-            <Deals />
-
-            <CategorySection
-              title="Home and outdoor"
-              bannerBg="#FFE6BF"
-              bannerImg={homeBanner}
-              items={homeAndOutdoorItems}
-              setPage={setCurrentPage}
+            <Hero setPage={handleSetPage} onSearch={handleSearch} categories={homepageData?.categories} />
+            <Deals
+              setPage={handleSetPage}
+              setSelectedProductId={setSelectedProductId}
+              preloadedDeals={homepageData?.featured}
+              loading={homepageLoading}
             />
 
-            <CategorySection
-              title="Consumer electronics"
-              bannerBg="#E5F1FF"
-              bannerImg={electronicsBanner}
-              items={electronicsItems}
-              setPage={setCurrentPage}
-            />
+            {homepageData?.categorySections?.map((section, i) => (
+              <CategorySection
+                key={section.category}
+                title={section.category}
+                bannerBg={BANNER_COLORS[i % BANNER_COLORS.length]}
+                preloadedProducts={section.products}
+                loading={homepageLoading}
+                setPage={handleSetPage}
+                setSelectedProductId={setSelectedProductId}
+                onSearch={handleSearch}
+              />
+            ))}
 
             <InquiryForm />
-            <RecommendedItems setPage={setCurrentPage} />
+            <RecommendedItems
+              setPage={handleSetPage}
+              setSelectedProductId={setSelectedProductId}
+              preloadedProducts={homepageData?.recommended}
+              loading={homepageLoading}
+            />
             <Services />
             <RegionSuppliers />
           </div>
@@ -112,7 +128,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header setPage={setCurrentPage} />
+      <Header setPage={handleSetPage} onSearch={handleSearch} />
 
       <main className="flex-grow pb-12">
         {renderContent()}
@@ -124,5 +140,12 @@ function App() {
   );
 }
 
-export default App;
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
 
+export default App;
