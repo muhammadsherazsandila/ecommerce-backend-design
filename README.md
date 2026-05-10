@@ -1,6 +1,27 @@
 # E-Commerce Backend Design
 
-Full-stack e-commerce project with a Node.js/Express API and a React/Vite frontend.
+Full-stack e-commerce project built as part of a software development internship, with a Node.js/Express API and a React/Vite frontend.
+
+Live URL: https://ecommerce-backend-by-sheraz.vercel.app/
+
+## Internship Context
+
+This project was completed as an internship assignment to demonstrate practical backend design and full-stack integration skills.
+
+Primary internship goals covered in this repository:
+
+- Design and implement REST APIs using Express and MongoDB.
+- Build secure authentication and authorization with JWT and role-based access.
+- Integrate third-party services for media handling (Cloudinary).
+- Connect a React frontend to production-style backend endpoints.
+- Organize the codebase with maintainable structure, middleware, and modular routing.
+
+## Project Highlights
+
+- Production-style backend architecture with clear separation of routes, controllers, models, and middleware.
+- End-to-end product workflow including listing, filtering, searching, and admin product creation.
+- Internship-focused implementation of secure auth flows and protected routes.
+- Data seeding utilities for realistic testing and portfolio demonstration.
 
 Live URL: https://ecommerce-backend-by-sheraz.vercel.app/
 
