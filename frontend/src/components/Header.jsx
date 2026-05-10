@@ -1,13 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, User, MessageSquare, Heart, ShoppingCart, Menu, ChevronDown, LogIn, LogOut, Plus, Shield, Loader2 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { productsAPI } from '../api';
-import logo from '../assets/Layout/Brand/logo-colored.png';
+import {
+  ChevronDown,
+  Heart,
+  Loader2,
+  LogIn,
+  LogOut,
+  Menu,
+  MessageSquare,
+  Plus,
+  Shield,
+  ShoppingCart,
+  User,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { productsAPI } from "../api";
+import logo from "../assets/Layout/Brand/logo-colored.png";
+import { useAuth } from "../context/AuthContext";
 
 const Header = ({ setPage, onSearch }) => {
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -18,9 +30,12 @@ const Header = ({ setPage, onSearch }) => {
 
   // Fetch categories on mount
   useEffect(() => {
-    productsAPI.getCategories().then(({ data }) => {
-      if (data.success) setCategories(data.categories);
-    }).catch(() => {});
+    productsAPI
+      .getCategories()
+      .then(({ data }) => {
+        if (data.success) setCategories(data.categories);
+      })
+      .catch(() => {});
   }, []);
 
   // Close suggestions on outside click
@@ -30,8 +45,8 @@ const Header = ({ setPage, onSearch }) => {
         setShowSuggestions(false);
       }
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   // Live search with debounce
@@ -69,35 +84,42 @@ const Header = ({ setPage, onSearch }) => {
     if (onSearch) {
       onSearch(searchTerm, selectedCategory);
     }
-    setPage('listing');
+    setPage("listing");
   };
 
   const handleSuggestionClick = (product) => {
     setShowSuggestions(false);
-    setSearchTerm('');
-    if (onSearch) onSearch('', '');
-    setPage('details');
+    setSearchTerm("");
+    if (onSearch) onSearch("", "");
+    setPage("details");
     // We need setSelectedProductId but Header doesn't have it,
     // so we navigate to listing with the product name as search
-    if (onSearch) onSearch(product.name, '');
-    setPage('listing');
+    if (onSearch) onSearch(product.name, "");
+    setPage("listing");
   };
 
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
-    setPage('home');
+    setPage("home");
   };
 
   return (
     <header className="bg-white border-b border-shade-border lg:sticky top-0 z-50 shadow-sm">
       {/* Top Header */}
-      <div className="container py-4 flex items-center justify-between gap-6">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => setPage('home')}>
-          <img src={logo} alt="Brand" className="h-[46px]" />
+      <div className="container py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setPage("home")}
+        >
+          <img src={logo} alt="Brand" className="h-10 md:h-[46px]" />
         </div>
 
-        <form onSubmit={handleSearch} className="flex-1 max-w-2xl relative" ref={searchRef}>
+        <form
+          onSubmit={handleSearch}
+          className="flex-1 max-w-2xl relative mt-3 md:mt-0"
+          ref={searchRef}
+        >
           <div className="flex border-2 border-primary rounded-lg overflow-hidden">
             {/* Category Dropdown */}
             <div className="relative border-r border-[#DEE2E7] bg-[#F7F7F7]">
@@ -111,10 +133,15 @@ const Header = ({ setPage, onSearch }) => {
               >
                 <option value="">All categories</option>
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
                 ))}
               </select>
-              <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8B96A5] pointer-events-none" />
+              <ChevronDown
+                size={14}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8B96A5] pointer-events-none"
+              />
             </div>
 
             {/* Search Input */}
@@ -122,7 +149,9 @@ const Header = ({ setPage, onSearch }) => {
               type="text"
               value={searchTerm}
               onChange={(e) => handleSearchInput(e.target.value)}
-              onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+              onFocus={() => {
+                if (suggestions.length > 0) setShowSuggestions(true);
+              }}
               placeholder="Search products..."
               className="flex-1 px-4 py-2 outline-none"
             />
@@ -151,17 +180,30 @@ const Header = ({ setPage, onSearch }) => {
                     >
                       <div className="w-10 h-10 bg-[#F7F7F7] rounded-md flex items-center justify-center overflow-hidden flex-shrink-0">
                         <img
-                          src={product.image || 'https://via.placeholder.com/40x40?text=...'}
+                          src={
+                            product.image ||
+                            "https://via.placeholder.com/40x40?text=..."
+                          }
                           alt=""
                           className="max-w-full max-h-full object-contain"
-                          onError={(e) => { e.target.src = 'https://via.placeholder.com/40x40?text=...'; }}
+                          onError={(e) => {
+                            e.target.src =
+                              "https://via.placeholder.com/40x40?text=...";
+                          }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-[#1C1C1C] truncate font-medium">{product.name}</p>
-                        <p className="text-xs text-[#8B96A5]">{product.category} {product.brand ? `• ${product.brand}` : ''}</p>
+                        <p className="text-sm text-[#1C1C1C] truncate font-medium">
+                          {product.name}
+                        </p>
+                        <p className="text-xs text-[#8B96A5]">
+                          {product.category}{" "}
+                          {product.brand ? `• ${product.brand}` : ""}
+                        </p>
                       </div>
-                      <span className="text-sm font-bold text-[#1C1C1C] flex-shrink-0">${product.price.toFixed(2)}</span>
+                      <span className="text-sm font-bold text-[#1C1C1C] flex-shrink-0">
+                        ${product.price.toFixed(2)}
+                      </span>
                     </div>
                   ))}
                   <div
@@ -174,7 +216,12 @@ const Header = ({ setPage, onSearch }) => {
               ) : (
                 <div className="px-4 py-4 text-center text-sm text-[#8B96A5]">
                   No products found for "{searchTerm}"
-                  {selectedCategory && <span> in <b>{selectedCategory}</b></span>}
+                  {selectedCategory && (
+                    <span>
+                      {" "}
+                      in <b>{selectedCategory}</b>
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -190,12 +237,17 @@ const Header = ({ setPage, onSearch }) => {
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
                 <div className="w-8 h-8 bg-gradient-to-br from-[#0D6EFD] to-[#005ADE] rounded-full flex items-center justify-center text-white text-xs font-bold mb-0.5">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
                 </div>
-                <span className="text-xs truncate max-w-[60px]">{user?.name?.split(' ')[0]}</span>
+                <span className="text-xs truncate max-w-[60px]">
+                  {user?.name?.split(" ")[0]}
+                </span>
               </div>
             ) : (
-              <div className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors" onClick={() => setPage('login')}>
+              <div
+                className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors"
+                onClick={() => setPage("login")}
+              >
                 <LogIn className="w-5 h-5 mb-1" />
                 <span className="text-xs">Sign In</span>
               </div>
@@ -204,11 +256,18 @@ const Header = ({ setPage, onSearch }) => {
             {/* Dropdown Menu */}
             {showUserMenu && isAuthenticated && (
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)}></div>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowUserMenu(false)}
+                ></div>
                 <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-[#DEE2E7] rounded-xl shadow-lg z-50 overflow-hidden">
                   <div className="px-4 py-3 border-b border-[#DEE2E7] bg-[#F7FAFC]">
-                    <p className="text-sm font-semibold text-[#1C1C1C] truncate">{user?.name}</p>
-                    <p className="text-xs text-[#8B96A5] truncate">{user?.email}</p>
+                    <p className="text-sm font-semibold text-[#1C1C1C] truncate">
+                      {user?.name}
+                    </p>
+                    <p className="text-xs text-[#8B96A5] truncate">
+                      {user?.email}
+                    </p>
                     {isAdmin && (
                       <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-[#FF9017] bg-[#FF9017]/10 px-2 py-0.5 rounded-full">
                         <Shield size={10} /> Admin
@@ -217,20 +276,29 @@ const Header = ({ setPage, onSearch }) => {
                   </div>
                   <div className="py-1">
                     <button
-                      onClick={() => { setPage('profile'); setShowUserMenu(false); }}
+                      onClick={() => {
+                        setPage("profile");
+                        setShowUserMenu(false);
+                      }}
                       className="w-full text-left px-4 py-2.5 text-sm text-[#505050] hover:bg-[#F7FAFC] hover:text-[#0D6EFD] transition-colors flex items-center gap-2"
                     >
                       <User size={16} /> Profile
                     </button>
                     <button
-                      onClick={() => { setPage('orders'); setShowUserMenu(false); }}
+                      onClick={() => {
+                        setPage("orders");
+                        setShowUserMenu(false);
+                      }}
                       className="w-full text-left px-4 py-2.5 text-sm text-[#505050] hover:bg-[#F7FAFC] hover:text-[#0D6EFD] transition-colors flex items-center gap-2"
                     >
                       <Heart size={16} /> Orders
                     </button>
                     {isAdmin && (
                       <button
-                        onClick={() => { setPage('addProduct'); setShowUserMenu(false); }}
+                        onClick={() => {
+                          setPage("addProduct");
+                          setShowUserMenu(false);
+                        }}
                         className="w-full text-left px-4 py-2.5 text-sm text-[#505050] hover:bg-[#F7FAFC] hover:text-[#0D6EFD] transition-colors flex items-center gap-2"
                       >
                         <Plus size={16} /> Add Product
@@ -250,15 +318,24 @@ const Header = ({ setPage, onSearch }) => {
             )}
           </div>
 
-          <div className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors" onClick={() => setPage('message')}>
+          <div
+            className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors"
+            onClick={() => setPage("message")}
+          >
             <MessageSquare className="w-5 h-5 mb-1" />
             <span className="text-xs">Message</span>
           </div>
-          <div className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors" onClick={() => setPage('orders')}>
+          <div
+            className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors"
+            onClick={() => setPage("orders")}
+          >
             <Heart className="w-5 h-5 mb-1" />
             <span className="text-xs">Orders</span>
           </div>
-          <div className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors" onClick={() => setPage('cart')}>
+          <div
+            className="flex flex-col items-center cursor-pointer text-secondary hover:text-primary transition-colors"
+            onClick={() => setPage("cart")}
+          >
             <ShoppingCart className="w-5 h-5 mb-1" />
             <span className="text-xs">My cart</span>
           </div>
@@ -269,18 +346,37 @@ const Header = ({ setPage, onSearch }) => {
       <div className="border-t border-shade-border bg-white overflow-x-auto lg:overflow-visible no-scrollbar">
         <div className="container py-3 flex items-center justify-between whitespace-nowrap gap-4">
           <nav className="flex items-center gap-6 font-medium text-dark">
-            <div className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors" onClick={() => { if (onSearch) onSearch('', ''); else setPage('listing'); }}>
+            <div
+              className="flex items-center gap-2 cursor-pointer hover:text-primary transition-colors"
+              onClick={() => {
+                if (onSearch) onSearch("", "");
+                else setPage("listing");
+              }}
+            >
               <Menu className="w-5 h-5" />
               <span>All category</span>
             </div>
-            <a href="#" className="hover:text-primary transition-colors" onClick={(e) => { e.preventDefault(); if (onSearch) onSearch('', ''); setPage('listing'); }}>Hot offers</a>
+            <a
+              href="#"
+              className="hover:text-primary transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                if (onSearch) onSearch("", "");
+                setPage("listing");
+              }}
+            >
+              Hot offers
+            </a>
             {/* Show first 4 categories from DB as quick links */}
             {categories.slice(0, 4).map((cat) => (
               <a
                 key={cat}
                 href="#"
                 className="hover:text-primary transition-colors hidden xl:block"
-                onClick={(e) => { e.preventDefault(); if (onSearch) onSearch('', cat); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onSearch) onSearch("", cat);
+                }}
               >
                 {cat}
               </a>
@@ -289,7 +385,10 @@ const Header = ({ setPage, onSearch }) => {
               <a
                 href="#"
                 className="hover:text-primary transition-colors text-[#FF9017] font-semibold flex items-center gap-1"
-                onClick={(e) => { e.preventDefault(); setPage('addProduct'); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPage("addProduct");
+                }}
               >
                 <Plus size={16} /> Add Product
               </a>
