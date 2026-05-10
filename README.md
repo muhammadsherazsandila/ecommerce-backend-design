@@ -2,6 +2,8 @@
 
 Full-stack e-commerce project with a Node.js/Express API and a React/Vite frontend.
 
+Live URL: https://ecommerce-backend-by-sheraz.vercel.app/
+
 ## Overview
 
 This repository contains:
