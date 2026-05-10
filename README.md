@@ -1,266 +1,208 @@
-# 🛒 E-Commerce Backend Design
+# E-Commerce Backend Design
 
-A full-stack e-commerce application with a **Node.js/Express** REST API backend and a **React/Vite** frontend. Built to demonstrate clean backend architecture — JWT authentication, role-based access control, Cloudinary image uploads, and MongoDB data modeling.
+Full-stack e-commerce project with a Node.js/Express API and a React/Vite frontend.
 
-> **Author:** [Muhammad Sheraz](https://muhammadsheraz.dev/)
+## Overview
 
-> 🌐 **Live Demo:** [ecommerce-backend-by-sheraz.vercel.app](https://ecommerce-backend-by-sheraz.vercel.app)
+This repository contains:
 
----
+- `backend`: Express 5 REST API with MongoDB/Mongoose, JWT auth, role-based access (`user`/`admin`), and Cloudinary image upload support.
+- `frontend`: React 18 + Vite app that consumes the backend API through Axios.
 
-## ✨ Features
+## Project Structure
 
-### Authentication & Authorization
-- User **signup** and **login** with hashed passwords (bcrypt)
-- **JWT**-based session tokens (7-day expiry)
-- **Role-based access** — `user` and `admin` roles
-- Protected `/me` endpoint to fetch the current user
-
-### Product Management
-- **Create products** (admin only) with image upload via Cloudinary
-- **Browse products** with pagination, search, and filters (category, brand, price range, featured)
-- **Homepage data** endpoint — categories, featured items, and recommendations in a single request
-- **Search** with auto-suggestions
-- **Featured products** and **categories** endpoints
-
-### Infrastructure
-- Express 5 with `compression` middleware
-- CORS configured for frontend origin
-- Multer for in-memory file handling (5 MB limit)
-- Cloudinary auto-optimization (resize, quality, format)
-- MongoDB text indexes for search performance
-- Nodemon for development hot-reload
-
----
-
-## 🏗️ Project Structure
-
-```
+```text
 ecommerce-backend-design/
 ├── backend/
 │   ├── src/
+│   │   ├── app.js
+│   │   ├── server.js
 │   │   ├── config/
-│   │   │   ├── cloudinary.js      # Cloudinary SDK setup
-│   │   │   └── db.js              # MongoDB connection
+│   │   │   ├── cloudinary.js
+│   │   │   └── db.js
 │   │   ├── controllers/
-│   │   │   ├── authController.js   # Signup, login, getMe
-│   │   │   └── productController.js # Product CRUD (create + read)
+│   │   │   ├── authController.js
+│   │   │   └── productController.js
 │   │   ├── middleware/
-│   │   │   ├── auth.js            # JWT protect & adminOnly guards
-│   │   │   └── upload.js          # Multer + Cloudinary upload helper
+│   │   │   ├── auth.js
+│   │   │   └── upload.js
 │   │   ├── models/
-│   │   │   ├── Product.js         # Product schema & text indexes
-│   │   │   └── User.js            # User schema with password hashing
+│   │   │   ├── Product.js
+│   │   │   └── User.js
 │   │   ├── routes/
-│   │   │   ├── authRoutes.js      # /api/auth/*
-│   │   │   ├── productRoutes.js   # /api/products/*
-│   │   │   └── index.js           # Route aggregator
-│   │   ├── scripts/
-│   │   │   └── seed.js            # Database seeder
-│   │   ├── app.js                 # Express app setup
-│   │   └── server.js              # Entry point — DB connect & listen
-│   ├── .env                       # Environment variables (not committed)
+│   │   │   ├── authRoutes.js
+│   │   │   ├── productRoutes.js
+│   │   │   └── index.js
+│   │   └── scripts/
+│   │       └── seed.js
 │   └── package.json
 ├── frontend/
 │   ├── src/
-│   │   ├── components/            # React components (AddProduct, Cart, etc.)
-│   │   ├── api.js                 # Axios API client
-│   │   └── ...
+│   │   ├── api.js
+│   │   ├── components/
+│   │   └── context/
 │   └── package.json
-├── .gitignore
 └── README.md
 ```
 
----
+## Features
 
-## 🚀 Getting Started
+- User signup/login with hashed passwords (`bcryptjs`) and JWT tokens.
+- Protected profile endpoint (`GET /api/auth/me`).
+- Admin-only product creation endpoint with optional multipart image upload.
+- Product listing with pagination, search, and filtering.
+- Homepage endpoint that returns categories, featured, recommended, and category sections in one request.
+- Seed script that fetches sample products from external APIs and creates test users.
 
-### Prerequisites
+## Prerequisites
 
-- **Node.js** ≥ 18
-- **MongoDB** running locally (or a connection URI)
-- **Cloudinary** account — [console.cloudinary.com](https://console.cloudinary.com/)
+- Node.js 18+
+- npm
+- MongoDB instance (local or Atlas)
+- Cloudinary account (recommended for image uploads and seeding)
 
-### 1. Clone the repo
+## Environment Variables
 
-```bash
-git clone https://github.com/muhammadsherazsandila/ecommerce-backend-design.git
-cd ecommerce-backend-design
-```
-
-### 2. Setup the backend
-
-```bash
-cd backend
-npm install
-```
-
-Create a `.env` file in `backend/`:
+Create `backend/.env`:
 
 ```env
 PORT=3000
 HOST=localhost
 CORS_ORIGIN=http://localhost:5173
 MONGODB_URI=mongodb://localhost:27017/ecommerce
-JWT_SECRET=your_secret_key_here
+JWT_SECRET=replace_with_strong_secret
 JWT_EXPIRES_IN=7d
 
-# Cloudinary
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-### 3. Seed the database (optional)
+Optional frontend environment (`frontend/.env`):
 
-```bash
-npm run seed
+```env
+VITE_API_BASE_URL=http://localhost:3000/api
 ```
 
-### 4. Start the backend
+If `VITE_API_BASE_URL` is not set, the frontend defaults to `http://localhost:3000/api`.
+
+## Installation and Run
+
+From repository root:
+
+1. Install backend dependencies:
 
 ```bash
-npm run dev        # development (nodemon)
-npm start          # production
+cd backend
+npm install
 ```
 
-The API will be available at `http://localhost:3000`.
-
-### 5. Setup the frontend
+2. Install frontend dependencies:
 
 ```bash
 cd ../frontend
 npm install
+```
+
+3. Start backend (terminal 1):
+
+```bash
+cd ../backend
 npm run dev
 ```
 
-The frontend will be available at `http://localhost:5173`.
+4. Start frontend (terminal 2):
 
----
-
-## 📡 API Reference
-
-**Base URL:** `http://localhost:3000/api`
-
-### Auth
-
-| Method | Endpoint        | Auth     | Description                  |
-|--------|-----------------|----------|------------------------------|
-| POST   | `/auth/signup`  | —        | Register a new user          |
-| POST   | `/auth/login`   | —        | Login and receive JWT        |
-| GET    | `/auth/me`      | Bearer   | Get current user profile     |
-
-#### Signup
-
-```json
-POST /api/auth/signup
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "secret123"
-}
+```bash
+cd ../frontend
+npm run dev
 ```
 
-#### Login
+Default URLs:
 
-```json
-POST /api/auth/login
-{
-  "email": "john@example.com",
-  "password": "secret123"
-}
-```
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3000`
+- API base: `http://localhost:3000/api`
 
-**Response:**
+## Backend Scripts
 
-```json
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": {
-    "id": "...",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "user"
-  }
-}
-```
+In `backend`:
 
----
+- `npm run dev` - Run API with nodemon.
+- `npm start` - Run API with Node.
+- `npm run seed` - Seed products and users.
 
-### Products — Public
+## Frontend Scripts
 
-| Method | Endpoint               | Description                                  |
-|--------|------------------------|----------------------------------------------|
-| GET    | `/products`            | List products (paginated, filterable)        |
-| GET    | `/products/search`     | Search with suggestions                      |
-| GET    | `/products/homepage`   | Homepage bundle (categories, featured, etc.) |
-| GET    | `/products/featured`   | Featured products                            |
-| GET    | `/products/categories` | All unique categories                        |
-| GET    | `/products/:id`        | Single product by ID                         |
+In `frontend`:
 
-#### Query Parameters for `GET /products`
+- `npm run dev` - Start Vite dev server.
+- `npm run build` - Build production bundle.
+- `npm run preview` - Preview built app.
 
-| Param      | Type    | Default       | Description                      |
-|------------|---------|---------------|----------------------------------|
-| `page`     | number  | `1`           | Page number                      |
-| `limit`    | number  | `12`          | Items per page (max 50)          |
-| `search`   | string  | —             | Full-text search                 |
-| `category` | string  | —             | Filter by exact category         |
-| `brand`    | string  | —             | Filter by brand                  |
-| `minPrice` | number  | —             | Minimum price                    |
-| `maxPrice` | number  | —             | Maximum price                    |
-| `featured` | boolean | —             | Only featured products           |
-| `sort`     | string  | `-createdAt`  | Sort field (prefix `-` for desc) |
+## API Endpoints
 
----
+Base path: `/api`
 
-### Products — Admin
+Health and root:
 
-| Method | Endpoint     | Auth          | Description                        |
-|--------|-------------|---------------|------------------------------------|
-| POST   | `/products` | Bearer + Admin | Create a product (multipart/form-data) |
+- `GET /` - API welcome message.
+- `GET /health` - Health status with uptime.
+- `GET /api/` - API routes ready message.
 
-#### Create Product
+Auth:
 
-```
-POST /api/products
-Authorization: Bearer <token>
-Content-Type: multipart/form-data
+- `POST /api/auth/signup`
+- `POST /api/auth/login`
+- `GET /api/auth/me` (Bearer token required)
 
-Fields: name*, price*, category*, oldPrice, description, stock,
-        rating, brand, shipping, featured, image (file)
-```
+Products (public):
 
----
+- `GET /api/products`
+- `GET /api/products/search`
+- `GET /api/products/homepage`
+- `GET /api/products/featured`
+- `GET /api/products/categories`
+- `GET /api/products/:id`
 
-## 🔐 Auth Middleware
+Products (protected):
 
-All protected routes require the `Authorization` header:
+- `POST /api/products` (Bearer token + admin role)
 
-```
-Authorization: Bearer <jwt_token>
-```
+`GET /api/products` query parameters:
 
-- **`protect`** — Validates the JWT and attaches `req.user`
-- **`adminOnly`** — Restricts access to users with `role: "admin"`
+- `page` (default `1`)
+- `limit` (default `12`, max `50`)
+- `search`
+- `category`
+- `brand`
+- `minPrice`
+- `maxPrice`
+- `featured` (`true` to filter featured)
+- `sort` (default `-createdAt`)
 
----
+`GET /api/products/search` query parameters:
 
-## 🛠️ Tech Stack
+- `q`
+- `category`
+- `limit` (default `10`, max `20`)
 
-| Layer      | Technology                                      |
-|------------|------------------------------------------------|
-| Runtime    | Node.js                                         |
-| Framework  | Express 5                                        |
-| Database   | MongoDB + Mongoose                               |
-| Auth       | JWT (jsonwebtoken) + bcryptjs                    |
-| Uploads    | Multer (memory) → Cloudinary                     |
-| Frontend   | React 18 + Vite + Tailwind CSS                   |
-| HTTP Client| Axios                                            |
+## Seed Data
 
----
+Run `npm run seed` in `backend` to:
 
-<p align="center">
-  Built by <a href="https://muhammadsheraz.dev/">Muhammad Sheraz</a>
-</p>
+- Clear existing products and users.
+- Fetch products from DummyJSON and FakeStoreAPI.
+- Upload product images to Cloudinary (falls back to source image URL if upload fails).
+- Create demo users:
+  - Admin: `admin@ecommerce.com` / `admin123`
+  - User: `user@ecommerce.com` / `user123`
+
+## Tech Stack
+
+- Backend: Node.js, Express 5, Mongoose, JWT, bcryptjs, multer, cloudinary, cors, compression
+- Frontend: React 18, Vite, Tailwind CSS, Axios, React Router
+
+## Author
+
+- Muhammad Sheraz: https://muhammadsheraz.dev/
