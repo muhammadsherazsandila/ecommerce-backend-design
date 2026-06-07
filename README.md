@@ -1,231 +1,291 @@
-# E-Commerce Backend Design
+<div align="center">
 
-Full-stack e-commerce project built as part of a software development internship, with a Node.js/Express API and a React/Vite frontend.
+# 🛍️ E-Commerce Backend Design — Full-Stack Store
 
-Live URL: https://ecommerce-backend-by-sheraz.vercel.app/
+### Built during my Full Stack Developer Internship at [DevelopersHub Corporation](https://www.linkedin.com/company/developershub-corporation/)
 
-## Internship Context
+[![Live Demo](https://img.shields.io/badge/Live_Demo-ecommerce--backend--by--sheraz.vercel.app-4F46E5?style=for-the-badge)](https://ecommerce-backend-by-sheraz.vercel.app/)
+[![MERN Stack](https://img.shields.io/badge/Stack-MERN-00D084?style=for-the-badge)](#-tech-stack)
+[![Internship](https://img.shields.io/badge/Internship-DevelopersHub_Corp-FF6B35?style=for-the-badge)](#-internship-context)
 
-This project was completed as an internship assignment to demonstrate practical backend design and full-stack integration skills.
+A production-style full-stack e-commerce application demonstrating robust **backend architecture** with Node.js/Express.js, MongoDB, JWT authentication, role-based access control, and a React/Vite frontend.
 
-Primary internship goals covered in this repository:
+[Live Demo](https://ecommerce-backend-by-sheraz.vercel.app/) · [Features](#-features) · [Tech Stack](#-tech-stack) · [API Docs](#-api-documentation) · [Getting Started](#-getting-started)
 
-- Design and implement REST APIs using Express and MongoDB.
-- Build secure authentication and authorization with JWT and role-based access.
-- Integrate third-party services for media handling (Cloudinary).
-- Connect a React frontend to production-style backend endpoints.
-- Organize the codebase with maintainable structure, middleware, and modular routing.
+</div>
 
-## Project Highlights
+---
 
-- Production-style backend architecture with clear separation of routes, controllers, models, and middleware.
-- End-to-end product workflow including listing, filtering, searching, and admin product creation.
-- Internship-focused implementation of secure auth flows and protected routes.
-- Data seeding utilities for realistic testing and portfolio demonstration.
+## 🏢 Internship Context
 
-Live URL: https://ecommerce-backend-by-sheraz.vercel.app/
+This project was designed and developed during my **Full Stack Developer internship** at **[DevelopersHub Corporation](https://www.linkedin.com/company/developershub-corporation/)** (May 2026 – June 2026). It served as the primary backend-focused internship deliverable demonstrating production-style API design and full-stack integration.
 
-## Overview
+**Internship objectives covered:**
+- Design and implement RESTful APIs using Express.js v5 and MongoDB
+- Build secure authentication and authorization with JWT and role-based access (`user` / `admin`)
+- Integrate third-party services for media handling (Cloudinary)
+- Connect a React frontend to production-style backend endpoints
+- Implement data seeding utilities for realistic testing
+- Organize the codebase with MVC architecture, middleware, and modular routing
+- Deploy full-stack application (Vercel + Render + MongoDB Atlas)
 
-This repository contains:
+---
 
-- `backend`: Express 5 REST API with MongoDB/Mongoose, JWT auth, role-based access (`user`/`admin`), and Cloudinary image upload support.
-- `frontend`: React 18 + Vite app that consumes the backend API through Axios.
+## ✨ Features
 
-## Project Structure
+### 👤 User Features
+| Feature | Description |
+|---------|-------------|
+| **User Registration & Login** | Secure JWT-based authentication |
+| **Product Browsing** | Browse products with filtering and search |
+| **Product Details** | View detailed product information with images |
+| **Responsive UI** | Mobile-friendly React frontend |
 
-```text
+### 🔐 Admin Features
+| Feature | Description |
+|---------|-------------|
+| **Product Management** | Full CRUD — create, read, update, delete products |
+| **Image Upload** | Cloudinary integration for product image hosting |
+| **Role-Based Access** | Admin-only routes protected by middleware |
+| **Data Seeding** | Seed script for populating realistic test data |
+
+### 🏗️ Architecture Highlights
+| Feature | Description |
+|---------|-------------|
+| **MVC Pattern** | Clean separation of routes, controllers, models, middleware |
+| **Protected Routes** | JWT verification middleware on all sensitive endpoints |
+| **Role Authorization** | `user` and `admin` roles with different permissions |
+| **Error Handling** | Centralized error handling middleware |
+| **CORS Configuration** | Production-ready cross-origin setup |
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+| Technology | Purpose |
+|---|---|
+| **Node.js** | Server-side JavaScript runtime |
+| **Express.js v5** | Web framework (latest version) |
+| **MongoDB** | NoSQL database |
+| **Mongoose** | ODM for MongoDB |
+| **JWT (jsonwebtoken)** | Authentication tokens |
+| **bcrypt** | Password hashing |
+| **Cloudinary** | Image upload and CDN |
+| **Multer** | File upload handling |
+| **CORS** | Cross-origin resource sharing |
+
+### Frontend
+| Technology | Purpose |
+|---|---|
+| **React 18** | UI library |
+| **Vite** | Build tool & dev server |
+| **React Router DOM** | Client-side routing |
+| **Axios** | HTTP client |
+| **Tailwind CSS** | Utility-first styling |
+
+### Deployment
+| Service | Purpose |
+|---|---|
+| **Vercel** | Frontend hosting |
+| **Render** | Backend API hosting |
+| **MongoDB Atlas** | Cloud database |
+| **Cloudinary** | Image CDN |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│            FRONTEND (Vercel)                       │
+│        React 18 + Vite + Tailwind CSS             │
+│                                                    │
+│  ┌──────────┐  ┌──────────┐  ┌───────────────┐  │
+│  │ Product  │  │  Auth    │  │ Admin Panel  │  │
+│  │ Listing  │  │  Pages   │  │ (CRUD)       │  │
+│  └────┬─────┘  └────┬─────┘  └──────┬────────┘  │
+│       │              │               │           │
+├───────┼──────────────┼───────────────┼───────────┤
+│                   REST API                        │
+├─────────────────────────────────────────────────────┤
+│            BACKEND (Render)                       │
+│        Express.js v5 + MongoDB                    │
+│                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │   Auth       │  │  Product     │  │  Middleware │  │
+│  │  Controller  │  │ Controller   │  │  (JWT +     │  │
+│  │  (JWT+Roles) │  │ (CRUD+Search)│  │   Roles)   │  │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬─────┘  │
+│        └─────────────┼──────────────┘           │
+│             ┌───────┴───────┐                    │
+│             │ MongoDB Atlas │                    │
+│             └───────────────┘                    │
+│                                                   │
+│  ┌─────────────────────────────────────────────┐  │
+│  │    Cloudinary (Product Image CDN)             │  │
+│  └─────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📁 Project Structure
+
+```
 ecommerce-backend-design/
 ├── backend/
 │   ├── src/
-│   │   ├── app.js
-│   │   ├── server.js
+│   │   ├── app.js                # Express app configuration
+│   │   ├── server.js             # Server entry point
 │   │   ├── config/
-│   │   │   ├── cloudinary.js
-│   │   │   └── db.js
+│   │   │   ├── cloudinary.js     # Cloudinary configuration
+│   │   │   └── db.js             # MongoDB connection setup
 │   │   ├── controllers/
-│   │   │   ├── authController.js
-│   │   │   └── productController.js
+│   │   │   ├── authController.js # Registration, login, JWT
+│   │   │   └── productController.js # Product CRUD + search
 │   │   ├── middleware/
-│   │   │   ├── auth.js
-│   │   │   └── upload.js
+│   │   │   ├── auth.js           # JWT verification middleware
+│   │   │   └── upload.js         # Multer + Cloudinary upload
 │   │   ├── models/
-│   │   │   ├── Product.js
-│   │   │   └── User.js
+│   │   │   ├── Product.js        # Product schema
+│   │   │   └── User.js           # User schema (with roles)
 │   │   ├── routes/
-│   │   │   ├── authRoutes.js
-│   │   │   ├── productRoutes.js
-│   │   │   └── index.js
+│   │   │   ├── authRoutes.js     # Auth endpoints
+│   │   │   ├── productRoutes.js  # Product endpoints
+│   │   │   └── index.js          # Route aggregator
 │   │   └── scripts/
-│   │       └── seed.js
+│   │       └── seed.js           # Database seeding utility
 │   └── package.json
+│
 ├── frontend/
 │   ├── src/
-│   │   ├── api.js
-│   │   ├── components/
-│   │   └── context/
+│   │   ├── components/           # Reusable UI components
+│   │   ├── pages/                # Route page components
+│   │   ├── services/             # API service layer
+│   │   ├── context/              # Auth context provider
+│   │   ├── App.jsx               # Root component
+│   │   └── main.jsx              # Entry point
 │   └── package.json
+│
 └── README.md
 ```
 
-## Features
+---
 
-- User signup/login with hashed passwords (`bcryptjs`) and JWT tokens.
-- Protected profile endpoint (`GET /api/auth/me`).
-- Admin-only product creation endpoint with optional multipart image upload.
-- Product listing with pagination, search, and filtering.
-- Homepage endpoint that returns categories, featured, recommended, and category sections in one request.
-- Seed script that fetches sample products from external APIs and creates test users.
+## 📡 API Documentation
 
-## Prerequisites
+### Authentication
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Public | Register a new user |
+| `POST` | `/api/auth/login` | Public | Login and receive JWT |
 
-- Node.js 18+
-- npm
-- MongoDB instance (local or Atlas)
-- Cloudinary account (recommended for image uploads and seeding)
+### Products
+| Method | Endpoint | Access | Description |
+|---|---|---|---|
+| `GET` | `/api/products` | Public | List all products (with filtering & search) |
+| `GET` | `/api/products/:id` | Public | Get product details by ID |
+| `POST` | `/api/products` | Admin only | Create a new product (with image upload) |
+| `PUT` | `/api/products/:id` | Admin only | Update a product |
+| `DELETE` | `/api/products/:id` | Admin only | Delete a product |
 
-## Environment Variables
+### Role-Based Access Control
 
-Create `backend/.env`:
-
-```env
-PORT=3000
-HOST=localhost
-CORS_ORIGIN=http://localhost:5173
-MONGODB_URI=mongodb://localhost:27017/ecommerce
-JWT_SECRET=replace_with_strong_secret
-JWT_EXPIRES_IN=7d
-
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+```
+┌───────────────────────────────────────────────┐
+│  PUBLIC ROUTES (No Auth Required)             │
+│  • POST /api/auth/register                    │
+│  • POST /api/auth/login                       │
+│  • GET  /api/products                         │
+│  • GET  /api/products/:id                     │
+├───────────────────────────────────────────────┤
+│  ADMIN ROUTES (JWT + admin role)              │
+│  • POST   /api/products      (create)         │
+│  • PUT    /api/products/:id  (update)         │
+│  • DELETE /api/products/:id  (delete)         │
+└───────────────────────────────────────────────┘
 ```
 
-Optional frontend environment (`frontend/.env`):
+---
 
-```env
-VITE_API_BASE_URL=http://localhost:3000/api
-```
+## 🚀 Getting Started
 
-If `VITE_API_BASE_URL` is not set, the frontend defaults to `http://localhost:3000/api`.
+### Prerequisites
+- **Node.js** v18+
+- **MongoDB** database (or [MongoDB Atlas](https://www.mongodb.com/atlas) account)
+- **Cloudinary** account for image uploads
 
-## Installation and Run
-
-From repository root:
-
-1. Install backend dependencies:
-
+### Backend Setup
 ```bash
 cd backend
 npm install
 ```
 
-2. Install frontend dependencies:
+Create a `.env` file:
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+FRONTEND_URL=http://localhost:5173
+PORT=3000
+```
 
+Seed the database (optional):
 ```bash
-cd ../frontend
+node src/scripts/seed.js
+```
+
+Start the server:
+```bash
+npm run dev
+```
+
+### Frontend Setup
+```bash
+cd frontend
 npm install
 ```
 
-3. Start backend (terminal 1):
+Create a `.env` file:
+```env
+VITE_BACKEND_URL=http://localhost:3000
+```
 
+Start the app:
 ```bash
-cd ../backend
 npm run dev
 ```
 
-4. Start frontend (terminal 2):
+The app will be available at `http://localhost:5173`.
 
-```bash
-cd ../frontend
-npm run dev
-```
+---
 
-Default URLs:
+## 🔑 Key Technical Highlights
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:3000`
-- API base: `http://localhost:3000/api`
+| Aspect | Implementation |
+|--------|---------------|
+| **Authentication** | JWT with bcrypt password hashing |
+| **Authorization** | Role-based middleware (`user` vs `admin`) |
+| **Image Handling** | Multer → Cloudinary pipeline for product images |
+| **Data Seeding** | Custom seed script for realistic demo data |
+| **API Design** | RESTful conventions with proper HTTP status codes |
+| **Error Handling** | Centralized error middleware with meaningful messages |
+| **CORS** | Configured for production frontend-backend separation |
 
-## Backend Scripts
+---
 
-In `backend`:
+## 👨‍💻 Developer
 
-- `npm run dev` - Run API with nodemon.
-- `npm start` - Run API with Node.
-- `npm run seed` - Seed products and users.
+**Muhammad Sheraz**
+Full Stack Developer (MERN Stack)
 
-## Frontend Scripts
+🌐 [Portfolio](https://sherazportfolio.vercel.app) · 💼 [LinkedIn](https://linkedin.com/in/muhammad-sheraz-800948347) · 🏢 Internship at [DevelopersHub Corporation](https://www.linkedin.com/company/developershub-corporation/)
 
-In `frontend`:
+---
 
-- `npm run dev` - Start Vite dev server.
-- `npm run build` - Build production bundle.
-- `npm run preview` - Preview built app.
+## 📄 License
 
-## API Endpoints
-
-Base path: `/api`
-
-Health and root:
-
-- `GET /` - API welcome message.
-- `GET /health` - Health status with uptime.
-- `GET /api/` - API routes ready message.
-
-Auth:
-
-- `POST /api/auth/signup`
-- `POST /api/auth/login`
-- `GET /api/auth/me` (Bearer token required)
-
-Products (public):
-
-- `GET /api/products`
-- `GET /api/products/search`
-- `GET /api/products/homepage`
-- `GET /api/products/featured`
-- `GET /api/products/categories`
-- `GET /api/products/:id`
-
-Products (protected):
-
-- `POST /api/products` (Bearer token + admin role)
-
-`GET /api/products` query parameters:
-
-- `page` (default `1`)
-- `limit` (default `12`, max `50`)
-- `search`
-- `category`
-- `brand`
-- `minPrice`
-- `maxPrice`
-- `featured` (`true` to filter featured)
-- `sort` (default `-createdAt`)
-
-`GET /api/products/search` query parameters:
-
-- `q`
-- `category`
-- `limit` (default `10`, max `20`)
-
-## Seed Data
-
-Run `npm run seed` in `backend` to:
-
-- Clear existing products and users.
-- Fetch products from DummyJSON and FakeStoreAPI.
-- Upload product images to Cloudinary (falls back to source image URL if upload fails).
-- Create demo users:
-  - Admin: `admin@ecommerce.com` / `admin123`
-  - User: `user@ecommerce.com` / `user123`
-
-## Tech Stack
-
-- Backend: Node.js, Express 5, Mongoose, JWT, bcryptjs, multer, cloudinary, cors, compression
-- Frontend: React 18, Vite, Tailwind CSS, Axios, React Router
-
-## Author
-
-- Muhammad Sheraz: https://muhammadsheraz.dev/
+This project is open source and available under the [MIT License](LICENSE).
